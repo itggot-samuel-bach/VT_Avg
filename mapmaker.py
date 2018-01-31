@@ -97,7 +97,7 @@ class GeometryDoc():
         self.save()
         
     def save(self):
-        with open("doc.html", "w") as f:
+        with open("tempfiles/doc.html", "w") as f:
             f.write(self.doc)
             f.close()
         print("saved")

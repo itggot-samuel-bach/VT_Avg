@@ -9,7 +9,7 @@ import webbrowser
 from APIRequest import APIRequest
 from mapmaker import GeometryDoc
 
-os.chdir("C:\Edvin\Vasttrafik")
+# os.chdir("C:\Edvin\Vasttrafik")
 		
 
 class BackButton(Frame):
@@ -424,7 +424,12 @@ class Window(Tk):
             doc.addPoly(points, colour)
             doc.addMarker(points[0])
             doc.addMarker(points[-1])
-        webbrowser.open("file:///C:/Edvin/Vasttrafik/doc.html")
+
+        folder = os.path.dirname(__file__).replace("\\", "/")
+        print(folder)
+        path = "file:///" + folder + "/tempfiles/doc.html"
+        print(path)
+        webbrowser.open(path)
 
 if __name__ == "__main__":        
 	gui = Window()

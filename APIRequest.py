@@ -6,11 +6,15 @@ import requests
 class APIRequest():
     def __init__(self):
         # Read saved token
-        with open("C:/Edvin/Vasttrafik/token.txt") as f:
-            token = f.read()
-            f.close()
-        placeholder = "Bearer " + token
-        self.headers = {"Authorization": placeholder}
+        try:
+            with open("tempfiles/token.txt") as f:
+                token = f.read()
+                f.close()
+            placeholder = "Bearer " + token
+            self.headers = {"Authorization": placeholder}
+        except FileNotFoundError:
+            renewToken()
+            
 
     def getPlan(self, fr, to, time_=time.strftime("%H:%M"), date=time.strftime("%Y-%m-%d"), arr=False, sChTime=False):
         try:
@@ -42,7 +46,7 @@ class APIRequest():
             print("Status code:", r.status_code)
 
         # Save departures to file
-        file = open("trip.json", "w")
+        file = open("tempfiles/trip.json", "w")
         json.dump(r.json(), file, indent=4, ensure_ascii=True)
         file.close()
 
@@ -51,10 +55,12 @@ class APIRequest():
         return trips
 
     def renewToken(self):
+        with open("auth.txt", "r") as f:
+            auth = f.read()
+            f.close()
 
         # Send http request for new token
-        header = {"Content-Type": "application/x-www-form-urlencoded",
-                  "Authorization": "Basic M0xwNmx1SkxNczBEa1RBQVJDZkxjc1dhbzlVYToxM1REOF9vUHZ5ZTlhMVoyVTBmZHF5Nm5oeU1h"}
+        header = {"Content-Type": "application/x-www-form-urlencoded", "Authorization": auth}
         p = requests.post("https://api.vasttrafik.se/token?grant_type=client_credentials&scope=device_0",
                           headers=header)
         text = p.json()
@@ -62,7 +68,7 @@ class APIRequest():
         token = text.get("access_token")
 
         # save token for use next time
-        with open("C:/Edvin/Vasttrafik/token.txt", "w") as f:
+        with open("tempfiles/token.txt", "w") as f:
             f.write(token)
             f.close()
         placeholder = "Bearer " + token
@@ -97,7 +103,7 @@ class APIRequest():
             
             
         #Save to file
-        with open("deps.json", "w") as f:
+        with open("tempfiles/deps.json", "w") as f:
             json.dump(r.json(), f, indent=4)
             f.close()
         
@@ -122,7 +128,7 @@ class APIRequest():
             self.renewToken()
             r = requests.get(url, headers=self.headers)
 
-        with open("stops.txt", "w") as f:
+        with open("tempfiles/stops.txt", "w") as f:
             json.dump(r.json(), f, indent=4)
             f.close()
 
@@ -161,7 +167,7 @@ class APIRequest():
             r = requests.get(url, headers=self.headers)
 
         # Save to file
-        f = open("journey.json", "w")
+        f = open("tempfiles/journey.json", "w")
         json.dump(r.json(), f, indent=4)
         f.close()
 
@@ -183,7 +189,7 @@ class APIRequest():
         if r.status_code != 200:
             raise ValueError("Http error: " + str(r.status_code))
 
-        with open("geo.json", "w") as f:
+        with open("tempfiles/geo.json", "w") as f:
             json.dump(r.json(), f, indent=4)
 
         geo = r.json().get("Geometry").get("Points").get("Point")
