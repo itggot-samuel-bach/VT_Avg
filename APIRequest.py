@@ -153,12 +153,10 @@ class APIRequest():
 
         return stop, stopname
 
-    def getRoute(self, url, v2=False):
+    def getRoute(self, url):
         # HTTP Request
-        if v2:
-            r = requests.get(url, headers=self.headers)
-        else:
-            r = requests.get(url)
+        
+        r = requests.get(url, headers=self.headers)
         print("Status code:", r.status_code)
 
         # If token is invalid
@@ -185,6 +183,7 @@ class APIRequest():
                 r = requests.get(ref, headers=self.headers)
         else:
             r = requests.get(ref)
+        print(f'Status code: {r.status_code}')
 
         if r.status_code != 200:
             raise ValueError("Http error: " + str(r.status_code))

@@ -1,6 +1,8 @@
 import os
-import APIRequest
+
 import webbrowser
+
+import APIRequest
 
 class GeometryDoc():
     def __init__(self):

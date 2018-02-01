@@ -208,8 +208,8 @@ class Window(Tk):
         datebox.delete(0, END)
         datebox.insert(END, time.strftime("%Y-%m-%d"))
 
-    def displayRoute(self, url, v2=False):
-        stops = self.api.getRoute(url, v2)
+    def displayRoute(self, url):
+        stops = self.api.getRoute(url)
 
         # New Tkinter window
         routeRoot = Toplevel()
@@ -236,9 +236,13 @@ class Window(Tk):
         colour = stops.get("Color")
 
         # Print out line and destination
-        lab = Label(routeRoot, text=name + " mot " + dest, bg=colour.get("fgColor"), fg=colour.get("bgColor"))
+        lab = Label(routeRoot, text= f'{name} mot {dest}', bg=colour.get("fgColor"), fg=colour.get("bgColor"))
 
-        if len(stops.get("Stop")) > 30:
+        print(f'Number of stops: {len(stops.get("Stop"))}')
+        if len(stops.get("Stop")) > 60:
+            lab.grid(sticky=NE + SW, row=0, column=0, columnspan=6)
+            k = 6
+        elif len(stops.get("Stop")) > 30:
             lab.grid(sticky=NE + SW, row=0, column=0, columnspan=4)
             k = 4
         else:
@@ -249,10 +253,19 @@ class Window(Tk):
         for i, j in enumerate(stops.get("Stop")):
             clm = 0
             row = i
-            if len(stops.get("Stop")) > 30:
+            if len(stops.get("Stop")) > 60:
+                if i >= 2 * len(stops.get("Stop")) // 3:
+                    clm = 4
+                    row = i - (2 * len(stops.get("Stop")) // 3)
+                elif i >= len(stops.get("Stop")) // 3:
+                    clm = 2
+                    row = i - (len(stops.get("Stop")) // 3)
+                
+            elif len(stops.get("Stop")) > 30:
                 if i >= len(stops.get("Stop")) // 2:
                     clm = 2
                     row = i - (len(stops.get("Stop")) // 2)
+            
 
             Label(routeRoot, text=j.get("name")).grid(sticky=NE + SW, row=row + 1, column=clm)
             # Tries to get times. RT Dep -> TT Dep -> RT Arr -> TT Arr -> Error
