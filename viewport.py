@@ -6,7 +6,7 @@ from tkinter import *
 
 from APIRequest import APIRequest
 import mapmaker
-import main
+import misc
 		
 
 class BackButton(Frame):
@@ -136,7 +136,7 @@ class Window(Tk):
 
         if type(trip1) == list:
 
-            tTime, tH, tM = main.tripTime(trip1)
+            tTime, tH, tM = misc.tripTime(trip1)
 
             Label(frame, text= f'Resa {trip1[0].get("Origin").get("time")}-{trip1[-1].get("Destination").get("time")} - Restid {str(tH)} h {str(tM)} min', pady=5).grid(row=0, column=0, columnspan=2, sticky=NE + SW)
                                                                                           
@@ -163,7 +163,7 @@ class Window(Tk):
 
 
         elif type(trip1) == dict:
-            tTime, tH, tM = main.tripTime(trip1)
+            tTime, tH, tM = misc.tripTime(trip1)
 
             Label(frame, text="Resa " + trip1.get("Origin").get("time") + "-" + trip1.get("Destination").get(
                 "time") + " - Restid " + str(tH) + " h " + str(tM) + " min", pady=5).pack(side=TOP, fill=X)

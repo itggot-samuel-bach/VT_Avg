@@ -26,3 +26,6 @@ def tripTime(trip1):
         tH = tTime // 60
         tM = tTime % 60
         return tTime, tH, tM
+
+if __name__ == "__main__":        
+	print("This file is only supposed to be used as a module.")
