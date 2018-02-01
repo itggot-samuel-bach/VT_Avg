@@ -51,5 +51,32 @@ def dep(self, stop, timeP, date):
     departures = self.api.getDepartures(stop, date=date, time_=timeP)
     self.printDepartures(departures, stopname, date, timeP)
 
+def getDelay(times):
+    if not times.get("rtDepTime"):
+        hr1, mn1 = times.get("rtArrTime").split(":")
+        hr2, mn2 = times.get("arrTime").split(":")
+        rtDate = times.get("rtArrDate")
+        date = times.get("arrDate")
+    else:
+        hr1, mn1 = times.get("rtDepTime").split(":")
+        hr2, mn2 = times.get("depTime").split(":")
+        rtDate = times.get("rtDepDate")
+        date = times.get("depDate")
+    hr1, hr2, mn1, mn2 = int(hr1), int(hr2), int(mn1), int(mn2)
+
+    if not rtDate == date:
+        if hr1 < hr2:
+            hr1 += 24
+        else:
+            hr2 += 24
+    mn1 += hr1 * 60
+    mn2 += hr2 * 60
+    delay = mn1 - mn2
+    if delay >= 0:
+        delay = " +" + str(delay)
+    else:
+        delay = " " + str(delay)
+    return delay
+
 if __name__ == "__main__":        
 	print("This file is only supposed to be used as a module.")

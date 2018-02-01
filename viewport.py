@@ -236,40 +236,12 @@ class Viewport(Tk):
                         else:
                             Label(routeRoot, text="a(" + j.get("arrTime") + ")").grid(sticky=NE + SW, row=row + 1, column=clm + 1)
                     else:
-                        hr1, mn1 = j.get("rtArrTime").split(":")
-                        hr2, mn2 = j.get("arrTime").split(":")
-                        hr1, hr2, mn1, mn2 = int(hr1), int(hr2), int(mn1), int(mn2)
-                        if not j.get("rtArrDate") == j.get("arrDate"):
-                            if hr1 < hr2:
-                                hr1 += 24
-                            else:
-                                hr2 += 24
-                        mn1 += hr1 * 60
-                        mn2 += hr2 * 60
-                        delay = mn1 - mn2
-                        if delay >= 0:
-                            delay = " +" + str(delay)
-                        else:
-                            delay = " " + str(delay)
+                        delay = misc.getDelay(j)
                         Label(routeRoot, text="a" + j.get("arrTime") + delay).grid(sticky=NE + SW, row=row + 1, column=clm + 1)
                 else:
                     Label(routeRoot, text="(" + j.get("depTime") + ")").grid(sticky=NE + SW, row=row + 1, column=clm + 1)
             else:
-                hr1, mn1 = j.get("rtDepTime").split(":")
-                hr2, mn2 = j.get("depTime").split(":")
-                hr1, hr2, mn1, mn2 = int(hr1), int(hr2), int(mn1), int(mn2)
-                if not j.get("rtDepDate") == j.get("depDate"):
-                    if hr1 < hr2:
-                        hr1 += 24
-                    else:
-                        hr2 += 24
-                mn1 += hr1 * 60
-                mn2 += hr2 * 60
-                delay = mn1 - mn2
-                if delay >= 0:
-                    delay = " +" + str(delay)
-                else:
-                    delay = " " + str(delay)
+                delay = misc.getDelay(j)
                 Label(routeRoot, text=j.get("depTime") + delay).grid(sticky=NE + SW, row=row + 1, column=clm + 1)
 
         Button(routeRoot, text="Karta", command= lambda: mapmaker.geometryBackEnd(stops.get("GeometryRef").get("ref"), colour.get("fgColor"))).grid(column=0, columnspan=k, sticky=NE+SW)

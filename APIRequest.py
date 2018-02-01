@@ -63,8 +63,7 @@ class APIRequest():
 
         # Send http request for new token
         header = {"Content-Type": "application/x-www-form-urlencoded", "Authorization": auth}
-        p = requests.post("https://api.vasttrafik.se/token?grant_type=client_credentials&scope=device_0",
-                          headers=header)
+        p = requests.post("https://api.vasttrafik.se/token?grant_type=client_credentials&scope=device_0", headers=header)
         text = p.json()
 
         token = text.get("access_token")
