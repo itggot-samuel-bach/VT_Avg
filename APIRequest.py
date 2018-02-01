@@ -13,8 +13,8 @@ class APIRequest():
             placeholder = "Bearer " + token
             self.headers = {"Authorization": placeholder}
         except FileNotFoundError:
-            renewToken()
-            
+            self.renewToken()
+
 
     def getPlan(self, fr, to, time_=time.strftime("%H:%M"), date=time.strftime("%Y-%m-%d"), arr=False, sChTime=False):
         try:
