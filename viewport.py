@@ -295,21 +295,7 @@ class Viewport(Tk):
                 Label(self.frame, text="ca " + j.get("time")).grid(row=i + 2, column=2, sticky=NE + SW)
             else:
 
-                hr1, mn1 = j.get("rtTime").split(":")
-                hr2, mn2 = j.get("time").split(":")
-                hr1, hr2, mn1, mn2 = int(hr1), int(hr2), int(mn1), int(mn2)
-                if not j.get("rtDate") == j.get("date"):
-                    if hr1 < hr2:
-                        hr1 += 24
-                    else:
-                        hr2 += 24
-                mn1 += hr1 * 60
-                mn2 += hr2 * 60
-                delay = mn1 - mn2
-                if delay >= 0:
-                    delay = " +" + str(delay)
-                else:
-                    delay = " " + str(delay)
+                delay = misc.getDelay(j)
 
                 Label(self.frame, text=j.get("time") + delay).grid(row=i + 2, column=2, sticky=NE + SW)
 

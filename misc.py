@@ -52,16 +52,24 @@ def dep(self, stop, timeP, date):
     self.printDepartures(departures, stopname, date, timeP)
 
 def getDelay(times):
-    if not times.get("rtDepTime"):
-        hr1, mn1 = times.get("rtArrTime").split(":")
-        hr2, mn2 = times.get("arrTime").split(":")
-        rtDate = times.get("rtArrDate")
-        date = times.get("arrDate")
-    else:
+    if times.get("rtDepTime"):
         hr1, mn1 = times.get("rtDepTime").split(":")
         hr2, mn2 = times.get("depTime").split(":")
         rtDate = times.get("rtDepDate")
         date = times.get("depDate")
+    elif times.get("rtArrTime"):
+        hr1, mn1 = times.get("rtArrTime").split(":")
+        hr2, mn2 = times.get("arrTime").split(":")
+        rtDate = times.get("rtArrDate")
+        date = times.get("arrDate")
+    elif times.get("rtTime"):
+        hr1, mn1 = times.get("rtTime").split(":")
+        hr2, mn2 = times.get("time").split(":")
+        rtDate = times.get("rtDate")
+        date = times.get("date")
+    else:
+        return " Error"
+        
     hr1, hr2, mn1, mn2 = int(hr1), int(hr2), int(mn1), int(mn2)
 
     if not rtDate == date:
