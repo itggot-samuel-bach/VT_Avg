@@ -16,7 +16,7 @@ class BackButton(Frame):
         self.button.pack(fill=BOTH, expand=True)
 
 
-class Window(Tk):
+class Viewport(Tk):
     def __init__(self):
         Tk.__init__(self)
 
@@ -373,4 +373,4 @@ class Window(Tk):
     
 
 if __name__ == "__main__":        
-	gui = Window()
+	print("This file is only supposed to be used as a module.")
