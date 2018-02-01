@@ -51,14 +51,12 @@ class Window(Tk):
         Label(self.frame, text="Fr\u00e5n").grid(row=2, column=0, columnspan=1, sticky=NE + SW)
         frombox = Entry(self.frame)
         frombox.grid(row=2, column=1, columnspan=2, sticky=NE + SW)
-        Button(self.frame, text="Rensa", command=lambda: frombox.delete(0, END)).grid(row=2, column=3, columnspan=1,
-                                                                                      sticky=NE + SW)
+        Button(self.frame, text="Rensa", command=lambda: frombox.delete(0, END)).grid(row=2, column=3, columnspan=1, sticky=NE + SW)
 
         Label(self.frame, text="Till").grid(row=3, column=0, columnspan=1, sticky=NE + SW)
         tobox = Entry(self.frame)
         tobox.grid(row=3, column=1, columnspan=2, sticky=NE + SW)
-        Button(self.frame, text="Rensa", command=lambda: tobox.delete(0, END)).grid(row=3, column=3, columnspan=1,
-                                                                                    sticky=NE + SW)
+        Button(self.frame, text="Rensa", command=lambda: tobox.delete(0, END)).grid(row=3, column=3, columnspan=1, sticky=NE + SW)
 
         Label(self.frame, text="Tid").grid(row=4, column=0, columnspan=1, sticky=NE + SW)
         timebox = Entry(self.frame)
@@ -70,18 +68,15 @@ class Window(Tk):
         datebox.grid(row=5, column=1, columnspan=2, sticky=NE + SW)
         datebox.insert(END, time.strftime("%Y-%m-%d"))
 
-        Button(self.frame, text="Nu", command=lambda: self.setNow(timebox, datebox)).grid(row=4, column=3, rowspan=2,
-                                                                                          sticky=NE + SW)
+        Button(self.frame, text="Nu", command=lambda: self.setNow(timebox, datebox)).grid(row=4, column=3, rowspan=2, sticky=NE + SW)
 
-        Button(self.frame, text="Fler val", command=self.moreOptions).grid(row=6, column=0, columnspan=4,
-                                                                           sticky=NE + SW)
+        Button(self.frame, text="Fler val", command=self.moreOptions).grid(row=6, column=0, columnspan=4, sticky=NE + SW)
         self.arr = BooleanVar()
         self.sChTime = BooleanVar()
         self.x = BooleanVar()
 
-        Button(self.frame, text="Sök resa",
-               command=lambda: self.plan(frombox.get(), tobox.get(), timebox.get(), datebox.get(), self.arr.get(),
-                                         self.sChTime.get())).grid(column=0, columnspan=4, sticky=NE + SW)
+        Button(self.frame, text="Sök resa", command=lambda: self.plan(frombox.get(), tobox.get(), timebox.get(), datebox.get(), 
+            self.arr.get(), self.sChTime.get())).grid(column=0, columnspan=4, sticky=NE + SW)
         self.frame.bind("<Return>", lambda event: self.plan(frombox.get(), tobox.get(), timebox.get(), datebox.get(),
                                                             self.arr.get(), self.sChTime.get()))
 
@@ -91,13 +86,10 @@ class Window(Tk):
         root = Toplevel()
         Label(root, text="Fler val", font="bold").grid(row=0, column=0, columnspan=2, sticky=NE + SW)
 
-        Radiobutton(root, text="Ankomst", variable=self.arr, value=True).grid(row=1, column=0, columnspan=1,
-                                                                              sticky=N + SW)
-        Radiobutton(root, text="Avg\u00e5ng", variable=self.arr, value=False).grid(row=1, column=1, columnspan=1,
-                                                                                   sticky=N + SW)
+        Radiobutton(root, text="Ankomst", variable=self.arr, value=True).grid(row=1, column=0, columnspan=1, sticky=N + SW)
+        Radiobutton(root, text="Avg\u00e5ng", variable=self.arr, value=False).grid(row=1, column=1, columnspan=1, sticky=N + SW)
 
-        Checkbutton(root, text="Kort bytestid", variable=self.sChTime).grid(row=2, column=0, columnspan=1,
-                                                                            sticky=N + SW)
+        Checkbutton(root, text="Kort bytestid", variable=self.sChTime).grid(row=2, column=0, columnspan=1, sticky=N + SW)
 
         Checkbutton(root, text="Not in use", variable=self.x).grid(row=2, column=1, columnspan=1, sticky=N + SW)
 
@@ -149,9 +141,7 @@ class Window(Tk):
 
             tTime, tH, tM = self.tripTime(trip1)
 
-            Label(frame, text="Resa " + trip1[0].get("Origin").get("time") + "-" + trip1[-1].get("Destination").get(
-                "time") + " - Restid " + str(tH) + " h " + str(tM) + " min", pady=5).grid(row=0, column=0, columnspan=2,
-                                                                                          sticky=NE + SW)
+            Label(frame, text= f'Resa {trip1[0].get("Origin").get("time")}-{trip1[-1].get("Destination").get("time")} - Restid {str(tH)} h {str(tM)} min', pady=5).grid(row=0, column=0, columnspan=2, sticky=NE + SW)
                                                                                           
             print(trip1[0].get("GeometryRef").get("ref"))
             Button(frame, text="Karta", command= lambda: self.geometryBackEnd(trip1)).grid(row=1, column=0, columnspan=2, sticky=NE+SW)
@@ -267,6 +257,7 @@ class Window(Tk):
                 if i >= len(stops.get("Stop")) // 2:
                     clm = 2
                     row = i - (len(stops.get("Stop")) // 2)
+
             Label(routeRoot, text=j.get("name")).grid(sticky=NE + SW, row=row + 1, column=clm)
             # Tries to get times. RT Dep -> TT Dep -> RT Arr -> TT Arr -> Error
             if not j.get("rtDepTime"):
@@ -275,9 +266,7 @@ class Window(Tk):
                         if not j.get("arrTime"):
                             Label(routeRoot, text="Error").grid(sticky=NE + SW, row=row + 1, column=clm + 1)
                         else:
-                            Label(routeRoot, text="a(" + j.get("arrTime") + ")").grid(sticky=NE + SW,
-                                                                                                         row=row + 1,
-                                                                                                         column=clm + 1)
+                            Label(routeRoot, text="a(" + j.get("arrTime") + ")").grid(sticky=NE + SW, row=row + 1, column=clm + 1)
                     else:
                         hr1, mn1 = j.get("rtArrTime").split(":")
                         hr2, mn2 = j.get("arrTime").split(":")
@@ -294,13 +283,9 @@ class Window(Tk):
                             delay = " +" + str(delay)
                         else:
                             delay = " " + str(delay)
-                        Label(routeRoot, text="a" + j.get("arrTime") + delay).grid(sticky=NE + SW,
-                                                                                                      row=row + 1,
-                                                                                                      column=clm + 1)
+                        Label(routeRoot, text="a" + j.get("arrTime") + delay).grid(sticky=NE + SW, row=row + 1, column=clm + 1)
                 else:
-                    Label(routeRoot, text="(" + j.get("depTime") + ")").grid(sticky=NE + SW,
-                                                                                                row=row + 1,
-                                                                                                column=clm + 1)
+                    Label(routeRoot, text="(" + j.get("depTime") + ")").grid(sticky=NE + SW, row=row + 1, column=clm + 1)
             else:
                 hr1, mn1 = j.get("rtDepTime").split(":")
                 hr2, mn2 = j.get("depTime").split(":")
@@ -317,8 +302,7 @@ class Window(Tk):
                     delay = " +" + str(delay)
                 else:
                     delay = " " + str(delay)
-                Label(routeRoot, text=j.get("depTime") + delay).grid(sticky=NE + SW, row=row + 1,
-                                                                                        column=clm + 1)
+                Label(routeRoot, text=j.get("depTime") + delay).grid(sticky=NE + SW, row=row + 1, column=clm + 1)
 
         Button(routeRoot, text="Karta", command= lambda: self.geometryBackEnd(stops.get("GeometryRef").get("ref"), colour.get("fgColor"))).grid(column=0, columnspan=k, sticky=NE+SW)
 
@@ -333,8 +317,7 @@ class Window(Tk):
         Label(self.frame, text="Hållplats").grid(row=2, column=0, columnspan=1, sticky=NE + SW)
         stopbox = Entry(self.frame)
         stopbox.grid(row=2, column=1, columnspan=1, sticky=NE + SW)
-        Button(self.frame, text="Rensa", command=lambda: stopbox.delete(0, END)).grid(row=2, column=2, columnspan=1,
-                                                                                      sticky=NE + SW)
+        Button(self.frame, text="Rensa", command=lambda: stopbox.delete(0, END)).grid(row=2, column=2, columnspan=1, sticky=NE + SW)
 
         Label(self.frame, text="Tid").grid(row=3, column=0, columnspan=1, sticky=NE + SW)
         timebox = Entry(self.frame)
@@ -346,8 +329,7 @@ class Window(Tk):
         datebox.grid(row=4, column=1, columnspan=1, sticky=NE + SW)
         datebox.insert(END, time.strftime("%Y-%m-%d"))
 
-        Button(self.frame, text="Nu", command=lambda: self.setNow(timebox, datebox)).grid(row=3, column=2, rowspan=2,
-                                                                                          sticky=NE + SW)
+        Button(self.frame, text="Nu", command=lambda: self.setNow(timebox, datebox)).grid(row=3, column=2, rowspan=2, sticky=NE + SW)
 
         Button(self.frame, text="Sök", command=lambda: self.dep(stopbox.get(), timebox.get(), datebox.get())).grid(
             row=5, column=0, columnspan=3, sticky=NE + SW)
