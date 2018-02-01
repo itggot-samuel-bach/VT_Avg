@@ -4,7 +4,6 @@ import time
 import json
 from tkinter import *
 
-
 from APIRequest import APIRequest
 import mapmaker
 		
