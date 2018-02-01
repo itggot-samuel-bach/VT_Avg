@@ -408,9 +408,7 @@ class Window(Tk):
             doc.addMarker(points[-1])
 
         folder = os.path.dirname(__file__).replace("\\", "/")
-        print(folder)
         path = "file:///" + folder + "/tempfiles/doc.html"
-        print(path)
         webbrowser.open(path)
 
 if __name__ == "__main__":        

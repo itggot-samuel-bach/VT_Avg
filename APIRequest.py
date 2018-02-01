@@ -194,3 +194,6 @@ class APIRequest():
 
         geo = r.json().get("Geometry").get("Points").get("Point")
         return geo
+
+if __name__ == "__main__":        
+	print("This file is only supposed to be used as a module.")

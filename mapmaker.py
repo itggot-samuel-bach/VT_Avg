@@ -101,3 +101,6 @@ class GeometryDoc():
             f.write(self.doc)
             f.close()
         print("saved")
+
+if __name__ == "__main__":        
+	print("This file is only supposed to be used as a module.")
