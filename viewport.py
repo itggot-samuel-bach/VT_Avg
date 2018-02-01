@@ -6,6 +6,7 @@ from tkinter import *
 
 from APIRequest import APIRequest
 import mapmaker
+import main
 		
 
 class BackButton(Frame):
@@ -135,7 +136,7 @@ class Window(Tk):
 
         if type(trip1) == list:
 
-            tTime, tH, tM = self.tripTime(trip1)
+            tTime, tH, tM = main.tripTime(trip1)
 
             Label(frame, text= f'Resa {trip1[0].get("Origin").get("time")}-{trip1[-1].get("Destination").get("time")} - Restid {str(tH)} h {str(tM)} min', pady=5).grid(row=0, column=0, columnspan=2, sticky=NE + SW)
                                                                                           
@@ -162,7 +163,7 @@ class Window(Tk):
 
 
         elif type(trip1) == dict:
-            tTime, tH, tM = self.tripTime(trip1)
+            tTime, tH, tM = main.tripTime(trip1)
 
             Label(frame, text="Resa " + trip1.get("Origin").get("time") + "-" + trip1.get("Destination").get(
                 "time") + " - Restid " + str(tH) + " h " + str(tM) + " min", pady=5).pack(side=TOP, fill=X)
@@ -175,32 +176,6 @@ class Window(Tk):
             Label(frame, text=trip1.get("Origin").get("time") + " - " + trip1.get("Destination").get("time")).pack(
                 side=LEFT)
 
-    def tripTime(self, trip1):
-
-        if type(trip1) == list:
-            hr1, mn1 = trip1[0].get("Origin").get("time").split(":")
-            hr2, mn2 = trip1[-1].get("Destination").get("time").split(":")
-            hr1, hr2, mn1, mn2 = int(hr1), int(hr2), int(mn1), int(mn2)
-            if not trip1[0].get("Origin").get("date") == trip1[-1].get("Destination").get("date"):
-                if hr1 < hr2:
-                    hr1 += 24
-                else:
-                    hr2 += 24
-        else:
-            hr1, mn1 = trip1.get("Origin").get("time").split(":")
-            hr2, mn2 = trip1.get("Destination").get("time").split(":")
-            hr1, hr2, mn1, mn2 = int(hr1), int(hr2), int(mn1), int(mn2)
-            if not trip1.get("Origin").get("date") == trip1.get("Destination").get("date"):
-                if hr1 < hr2:
-                    hr1 += 24
-                else:
-                    hr2 += 24
-        mn1 += hr1 * 60
-        mn2 += hr2 * 60
-        tTime = mn2 - mn1
-        tH = tTime // 60
-        tM = tTime % 60
-        return tTime, tH, tM
 
     def setNow(self, timebox, datebox):
         timebox.delete(0, END)
