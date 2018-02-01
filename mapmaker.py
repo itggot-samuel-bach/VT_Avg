@@ -85,7 +85,7 @@ class GeometryDoc():
         if type(point) != dict:
             raise TypeError("Not a dict")
             
-        print("Adding marker")
+        # print("Adding marker")
         doc = "var point" + str(self.markers) + "= " + str(point) + """
                 var marker""" + str(self.markers) + """ = new google.maps.Marker({
                     position: point""" + str(self.markers) + """,
@@ -106,7 +106,7 @@ class GeometryDoc():
         with open("tempfiles/doc.html", "w") as f:
             f.write(self.doc)
             f.close()
-        print("saved")
+        # print("saved")
 
 def geometryBackEnd(ref, colour=None):
     doc = GeometryDoc()

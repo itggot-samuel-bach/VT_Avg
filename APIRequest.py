@@ -31,7 +31,7 @@ class APIRequest():
             url += "&searchForArrival=1"
         if sChTime:
             url += "&disregardDefaultChangeMargin=1"
-        print(url)
+        # print(url)
 
         # Http request trip
         r = requests.get(url, headers=self.headers)
@@ -174,15 +174,14 @@ class APIRequest():
         return stops
 
     def geometry(self, ref):
-        if "/v1/" not in ref:
-            r = requests.get(ref, headers=self.headers)
+        
+        r = requests.get(ref, headers=self.headers)
 
-            if r.status_code == 401:
-                # If token is invalid
-                self.renewToken()
-                r = requests.get(ref, headers=self.headers)
-        else:
-            r = requests.get(ref)
+        if r.status_code == 401:
+            # If token is invalid
+            self.renewToken()
+            r = requests.get(ref, headers=self.headers)
+    
         print(f'Status code: {r.status_code}')
 
         if r.status_code != 200:

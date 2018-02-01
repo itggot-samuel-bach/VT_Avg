@@ -94,8 +94,8 @@ class Window(Tk):
         root.mainloop()
 
     def plan(self, fr, to, timeP, date, arr, sChTime):
-        print(arr)
-        print(sChTime)
+        # print(arr)
+        # print(sChTime)
 
         toStop, toStopname = self.api.findStop(to)
         if not toStop:
@@ -139,7 +139,7 @@ class Window(Tk):
 
             Label(frame, text= f'Resa {trip1[0].get("Origin").get("time")}-{trip1[-1].get("Destination").get("time")} - Restid {str(tH)} h {str(tM)} min', pady=5).grid(row=0, column=0, columnspan=2, sticky=NE + SW)
                                                                                           
-            print(trip1[0].get("GeometryRef").get("ref"))
+            # print(trip1[0].get("GeometryRef").get("ref"))
             Button(frame, text="Karta", command= lambda: mapmaker.geometryBackEnd(trip1)).grid(row=1, column=0, columnspan=2, sticky=NE+SW)
 
             for i, j in enumerate(trip1):
@@ -157,7 +157,7 @@ class Window(Tk):
                         "time")).grid(row=i + 2, column=1, sticky=NE + SW)
                     Button(frame, text=j.get("name") + " till " + j.get("Destination").get("name"),
                            bg=j.get("fgColor"), fg=j.get("bgColor"),
-                           command=lambda j=j: self.displayRoute(j.get("JourneyDetailRef").get("ref"), v2=True),
+                           command=lambda j=j: self.displayRoute(j.get("JourneyDetailRef").get("ref")),
                            relief=FLAT).grid(row=i + 2, column=0, sticky=NE + SW)
 
 
@@ -170,7 +170,7 @@ class Window(Tk):
 
             Button(frame, text=trip1.get("name") + " till " + trip1.get("Destination").get("name"),
                    bg=trip1.get("fgColor"), fg=trip1.get("bgColor"),
-                   command=lambda: self.displayRoute(trip1.get("JourneyDetailRef").get("ref"), v2=True),
+                   command=lambda: self.displayRoute(trip1.get("JourneyDetailRef").get("ref")),
                    relief=FLAT).pack(side=LEFT, fill=X)
             Label(frame, text=trip1.get("Origin").get("time") + " - " + trip1.get("Destination").get("time")).pack(
                 side=LEFT)
