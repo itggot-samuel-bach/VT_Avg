@@ -10,7 +10,7 @@ class GeometryDoc():
     def __init__(self):
         self.polys = 0
         self.markers = 0
-        self.doc = """<!DOCTYPE html>
+        self.document = """<!DOCTYPE html>
                        <html>
                         <head>
                         <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
@@ -59,7 +59,7 @@ class GeometryDoc():
                     
     def addPoly(self, points, colour):
         #print(points)
-        doc = "var route" + str(self.polys) + """ = [];
+        document = "var route" + str(self.polys) + """ = [];
                             var flightPath""" + str(self.polys) + """ = new google.maps.Polyline({
                               path: route""" + str(self.polys) + """,
                               geodesic: true,
@@ -72,23 +72,23 @@ class GeometryDoc():
                             
                             //NEW"""
                             
-        doc = doc.replace(" = []", " = " + str(points).replace("},", "},\n").replace("'", "").replace('"', ""))
-        doc = doc.replace("lon:", "lng:")
+        document = document.replace(" = []", " = " + str(points).replace("},", "},\n").replace("'", "").replace('"', ""))
+        document = document.replace("lon:", "lng:")
         
-        doc = doc.replace("strokeColor: '#FF0000'", "strokeColor: '" + colour + "'")
+        document = document.replace("strokeColor: '#FF0000'", "strokeColor: '" + colour + "'")
         
-        self.doc = self.doc.replace("//NEW", doc)
+        self.document = self.document.replace("//NEW", document)
         self.polys += 1
         
-        #print(self.doc)
+        #print(self.document)
         self.save()
         
-    def addMarker(self, point):
-        if type(point) != dict:
-            raise TypeError("Not a dict")
+    def addMarker(self, points):
+        if type(points) != dict:
+            raise TypeError(f'Expected dict, {str(type(points))} received.')
             
         # print("Adding marker")
-        doc = "var point" + str(self.markers) + "= " + str(point) + """
+        document = "var point" + str(self.markers) + "= " + str(points) + """
                 var marker""" + str(self.markers) + """ = new google.maps.Marker({
                     position: point""" + str(self.markers) + """,
                     icon: image,
@@ -98,40 +98,40 @@ class GeometryDoc():
                 
                 //NEW"""
                 
-        doc = doc.replace("'lon'", "lng").replace("'", "").replace('"', "")
+        document = document.replace("'lon'", "lng").replace("'", "").replace('"', "")
         
-        self.doc = self.doc.replace("//NEW", doc)
+        self.document = self.document.replace("//NEW", document)
         self.markers += 1
         self.save()
         
     def save(self):
-        with open("tempfiles/doc.html", "w") as f:
-            f.write(self.doc)
-            f.close()
+        with open("tempfiles/document.html", "w") as file:
+            file.write(self.document)
+            file.close()
         # print("saved")
 
 def geometryBackEnd(ref, colour=None):
-    doc = GeometryDoc()
+    document = GeometryDoc()
     if type(ref) == list:
-        for i in ref:
-            geoRef = i.get("GeometryRef").get("ref")
+        for item in ref:
+            geoRef = item.get("GeometryRef").get("ref")
             points = APIRequest.APIRequest().geometry(geoRef)
             
-            colour = i.get("fgColor")
+            colour = item.get("fgColor")
             if colour is None: colour = "#00FF00"
             
-            doc.addPoly(points, colour)
-            doc.addMarker(points[0])
-        doc.addMarker(points[-1])
+            document.addPoly(points, colour)
+            document.addMarker(points[0])
+        document.addMarker(points[-1])
     
     else:
         points = APIRequest.APIRequest().geometry(ref)
-        doc.addPoly(points, colour)
-        doc.addMarker(points[0])
-        doc.addMarker(points[-1])
+        document.addPoly(points, colour)
+        document.addMarker(points[0])
+        document.addMarker(points[-1])
 
     folder = os.path.dirname(__file__).replace("\\", "/")
-    path = "file:///" + folder + "/tempfiles/doc.html"
+    path = f'file:///{folder}/tempfiles/document.html'
     webbrowser.open(path)
 
 if __name__ == "__main__":        

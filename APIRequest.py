@@ -18,7 +18,7 @@ class APIRequest():
             self.renewToken()
 
 
-    def getPlan(self, fr, to, time_=time.strftime("%H:%M"), date=time.strftime("%Y-%m-%d"), arr=False, sChTime=False):
+    def getPlan(self, fr, to, time_=time.strftime("%H:%M"), date=time.strftime("%Y-%m-%d"), arr=False, smallChangeTime=False):
         try:
             hour, minute = time_.split(":")
         except ValueError:
@@ -31,7 +31,7 @@ class APIRequest():
         url = "https://api.vasttrafik.se/bin/rest.exe/v2/trip?originId=" + fr + "&destId=" + to + "&date=" + date + "&time=" + hour + "%3A" + minute + "&format=json&needGeo=1"
         if arr:
             url += "&searchForArrival=1"
-        if sChTime:
+        if smallChangeTime:
             url += "&disregardDefaultChangeMargin=1"
         # print(url)
 
@@ -57,9 +57,9 @@ class APIRequest():
         return trips
 
     def renewToken(self):
-        with open("auth.txt", "r") as f:
-            auth = f.read()
-            f.close()
+        with open("auth.txt", "r") as file:
+            auth = file.read()
+            file.close()
 
         # Send http request for new token
         header = {"Content-Type": "application/x-www-form-urlencoded", "Authorization": auth}
@@ -69,9 +69,9 @@ class APIRequest():
         token = text.get("access_token")
 
         # save token for use next time
-        with open("tempfiles/token.txt", "w") as f:
-            f.write(token)
-            f.close()
+        with open("tempfiles/token.txt", "w") as file:
+            file.write(token)
+            file.close()
         placeholder = "Bearer " + token
         self.headers = {"Authorization": placeholder}
 
@@ -97,8 +97,8 @@ class APIRequest():
         print("Status code:", r.status_code)
         if r.status_code == 401:
             self.renewToken()
+            
             # Do http request again with new token
-
             r = requests.get(url, headers=self.headers)
             print("Status code:", r.status_code)
             
@@ -120,7 +120,7 @@ class APIRequest():
 
     def findStop(self, inp):
         # HTTP Request
-        url = "https://api.vasttrafik.se/bin/rest.exe/v2/location.name?input=" + inp + "&format=json"
+        url = f'https://api.vasttrafik.se/bin/rest.exe/v2/location.name?input={inp}&format=json'
         r = requests.get(url, headers=self.headers)
         print("Status code:", r.status_code)
 
@@ -129,9 +129,9 @@ class APIRequest():
             self.renewToken()
             r = requests.get(url, headers=self.headers)
 
-        with open("tempfiles/stops.json", "w") as f:
-            json.dump(r.json(), f, indent=4)
-            f.close()
+        with open("tempfiles/stops.json", "w") as file:
+            json.dump(r.json(), file, indent=4)
+            file.close()
 
         # Return dict of stops.
         if r.status_code == 403:
@@ -166,9 +166,9 @@ class APIRequest():
             r = requests.get(url, headers=self.headers)
 
         # Save to file
-        f = open("tempfiles/journey.json", "w")
-        json.dump(r.json(), f, indent=4)
-        f.close()
+        file = open("tempfiles/journey.json", "w")
+        json.dump(r.json(), file, indent=4)
+        file.close()
 
         # Return
         stops = r.json().get("JourneyDetail")
@@ -188,8 +188,8 @@ class APIRequest():
         if r.status_code != 200:
             raise ValueError("Http error: " + str(r.status_code))
 
-        with open("tempfiles/geo.json", "w") as f:
-            json.dump(r.json(), f, indent=4)
+        with open("tempfiles/geo.json", "w") as file:
+            json.dump(r.json(), file, indent=4)
 
         geo = r.json().get("Geometry").get("Points").get("Point")
         return geo

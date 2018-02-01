@@ -34,12 +34,12 @@ class Viewport(Tk):
         self.clearFrame()
 
         Label(self.frame, text="Välkommen till planeraren!", font='bold', padx=10, pady=5).pack(fill=BOTH, expand=True)
-        Button(self.frame, text="Reseplanerare", padx=5, pady=2, command=self.planBox).pack(fill=BOTH, expand=True)
-        Button(self.frame, text="Avgångar", padx=5, pady=2, command=self.depBox).pack(fill=BOTH, expand=True)
-        Button(self.frame, text="Ta mig hem", padx=5, pady=2, command=self.takeHomeBox).pack(fill=BOTH, expand=True)
+        Button(self.frame, text="Reseplanerare", padx=5, pady=2, command=self.tripPlanMenu).pack(fill=BOTH, expand=True)
+        Button(self.frame, text="Avgångar", padx=5, pady=2, command=self.departuresMenu).pack(fill=BOTH, expand=True)
+        Button(self.frame, text="Ta mig hem", padx=5, pady=2, command=self.takeMeHomeMenu).pack(fill=BOTH, expand=True)
         self.frame.mainloop()
 
-    def planBox(self):
+    def tripPlanMenu(self):
         self.clearFrame()
         BackButton(self).grid(row=0, column=0, columnspan=4, sticky=NE + SW)
 
@@ -69,13 +69,13 @@ class Viewport(Tk):
 
         Button(self.frame, text="Fler val", command=self.moreOptions).grid(row=6, column=0, columnspan=4, sticky=NE + SW)
         self.arr = BooleanVar()
-        self.sChTime = BooleanVar()
-        self.x = BooleanVar()
+        self.smallChangeTime = BooleanVar()
+        self.notInUse = BooleanVar()
 
         Button(self.frame, text="Sök resa", command=lambda: misc.plan(self, frombox.get(), tobox.get(), timebox.get(), datebox.get(), 
-            self.arr.get(), self.sChTime.get())).grid(column=0, columnspan=4, sticky=NE + SW)
+               self.arr.get(), self.smallChangeTime.get())).grid(column=0, columnspan=4, sticky=NE + SW)
         self.frame.bind("<Return>", lambda event: misc.plan(self, frombox.get(), tobox.get(), timebox.get(), datebox.get(),
-                                                            self.arr.get(), self.sChTime.get()))
+                                                            self.arr.get(), self.smallChangeTime.get()))
 
         self.frame.mainloop()
 
@@ -86,9 +86,9 @@ class Viewport(Tk):
         Radiobutton(root, text="Ankomst", variable=self.arr, value=True).grid(row=1, column=0, columnspan=1, sticky=N + SW)
         Radiobutton(root, text="Avg\u00e5ng", variable=self.arr, value=False).grid(row=1, column=1, columnspan=1, sticky=N + SW)
 
-        Checkbutton(root, text="Kort bytestid", variable=self.sChTime).grid(row=2, column=0, columnspan=1, sticky=N + SW)
+        Checkbutton(root, text="Kort bytestid", variable=self.smallChangeTime).grid(row=2, column=0, columnspan=1, sticky=N + SW)
 
-        Checkbutton(root, text="Not in use", variable=self.x).grid(row=2, column=1, columnspan=1, sticky=N + SW)
+        Checkbutton(root, text="Not in use", variable=self.notInUse).grid(row=2, column=1, columnspan=1, sticky=N + SW)
 
         Button(root, text="Klar", command=root.destroy).grid(row=3, column=0, columnspan=2, sticky=NE + SW)
 
@@ -114,50 +114,50 @@ class Viewport(Tk):
         for i in trip:
             self.printLeg(frame, i)
 
-    def printLeg(self, root, trip1):
+    def printLeg(self, root, trip):
         frame = Frame(root, bd=2, relief=GROOVE)
         frame.grid(column=0, columnspan=2, sticky=NE + SW)
 
-        if type(trip1) == list:
+        if type(trip) == list:
 
-            tTime, tH, tM = misc.tripTime(trip1)
+            tTime, tH, tM = misc.tripTime(trip)
 
-            Label(frame, text= f'Resa {trip1[0].get("Origin").get("time")}-{trip1[-1].get("Destination").get("time")} - Restid {str(tH)} h {str(tM)} min', pady=5).grid(row=0, column=0, columnspan=2, sticky=NE + SW)
+            Label(frame, text= f'Resa {trip[0].get("Origin").get("time")}-{trip[-1].get("Destination").get("time")} - Restid {str(tH)} h {str(tM)} min', pady=5).grid(row=0, column=0, columnspan=2, sticky=NE + SW)
                                                                                           
-            # print(trip1[0].get("GeometryRef").get("ref"))
-            Button(frame, text="Karta", command= lambda: mapmaker.geometryBackEnd(trip1)).grid(row=1, column=0, columnspan=2, sticky=NE+SW)
+            # print(trip[0].get("GeometryRef").get("ref"))
+            Button(frame, text="Karta", command= lambda: mapmaker.geometryBackEnd(trip)).grid(row=1, column=0, columnspan=2, sticky=NE+SW)
 
-            for i, j in enumerate(trip1):
-                if j.get("type") == "WALK":
-                    if not j.get("Origin").get("name") == j.get("Destination").get("name"):
-                        Label(frame, text=j.get("Origin").get("time") + " - " + j.get("Destination").get(
+            for i, leg in enumerate(trip):
+                if leg.get("type") == "WALK":
+                    if not leg.get("Origin").get("name") == leg.get("Destination").get("name"):
+                        Label(frame, text=leg.get("Origin").get("time") + " - " + leg.get("Destination").get(
                             "time")).grid(row=i + 2, column=1, sticky=NE + SW)
                         Label(frame,
-                              text=j.get("name") + " till " + j.get("Destination").get("name")).grid(
+                              text=leg.get("name") + " till " + leg.get("Destination").get("name")).grid(
                             row=i + 2, column=0, sticky=NE + SW)
 
 
                 else:
-                    Label(frame, text=j.get("Origin").get("time") + " - " + j.get("Destination").get(
+                    Label(frame, text=leg.get("Origin").get("time") + " - " + leg.get("Destination").get(
                         "time")).grid(row=i + 2, column=1, sticky=NE + SW)
-                    Button(frame, text=j.get("name") + " till " + j.get("Destination").get("name"),
-                           bg=j.get("fgColor"), fg=j.get("bgColor"),
-                           command=lambda j=j: self.displayRoute(j.get("JourneyDetailRef").get("ref")),
+                    Button(frame, text=leg.get("name") + " till " + leg.get("Destination").get("name"),
+                           bg=leg.get("fgColor"), fg=leg.get("bgColor"),
+                           command=lambda leg=leg: self.displayRoute(leg.get("JourneyDetailRef").get("ref")),
                            relief=FLAT).grid(row=i + 2, column=0, sticky=NE + SW)
 
 
-        elif type(trip1) == dict:
-            tTime, tH, tM = misc.tripTime(trip1)
+        elif type(trip) == dict:
+            triptime, tH, tM = misc.tripTime(trip)
 
-            Label(frame, text="Resa " + trip1.get("Origin").get("time") + "-" + trip1.get("Destination").get(
+            Label(frame, text="Resa " + trip.get("Origin").get("time") + "-" + trip.get("Destination").get(
                 "time") + " - Restid " + str(tH) + " h " + str(tM) + " min", pady=5).pack(side=TOP, fill=X)
-            Button(frame, text="Karta", command= lambda: mapmaker.geometryBackEnd(trip1.get("GeometryRef").get("ref"), trip1.get("fgColor"))).pack(fill=X)
+            Button(frame, text="Karta", command= lambda: mapmaker.geometryBackEnd(trip.get("GeometryRef").get("ref"), trip.get("fgColor"))).pack(fill=X)
 
-            Button(frame, text=trip1.get("name") + " till " + trip1.get("Destination").get("name"),
-                   bg=trip1.get("fgColor"), fg=trip1.get("bgColor"),
-                   command=lambda: self.displayRoute(trip1.get("JourneyDetailRef").get("ref")),
+            Button(frame, text=trip.get("name") + " till " + trip.get("Destination").get("name"),
+                   bg=trip.get("fgColor"), fg=trip.get("bgColor"),
+                   command=lambda: self.displayRoute(trip.get("JourneyDetailRef").get("ref")),
                    relief=FLAT).pack(side=LEFT, fill=X)
-            Label(frame, text=trip1.get("Origin").get("time") + " - " + trip1.get("Destination").get("time")).pack(
+            Label(frame, text=trip.get("Origin").get("time") + " - " + trip.get("Destination").get("time")).pack(
                 side=LEFT)
 
 
@@ -168,16 +168,16 @@ class Viewport(Tk):
         datebox.insert(END, time.strftime("%Y-%m-%d"))
 
     def displayRoute(self, url):
-        stops = self.api.getRoute(url)
+        route = self.api.getRoute(url)
 
         # New Tkinter window
         routeRoot = Toplevel()
 
         # Get name of route ("Buss 50")
         try:
-            name = stops.get("JourneyName")[0].get("name")
+            name = route.get("JourneyName")[0].get("name")
         except KeyError:
-            name = stops.get("JourneyName").get("name")
+            name = route.get("JourneyName").get("name")
 
         # Make names presentable
         name = name.replace("Bus", "Buss")
@@ -187,68 +187,68 @@ class Viewport(Tk):
 
         # Get destination ("Centralstationen")
         try:
-            dest = stops.get("Direction")[0].get("$")
+            destination = route.get("Direction")[0].get("$")
         except KeyError:
-            dest = stops.get("Direction").get("$")
+            destination = route.get("Direction").get("$")
 
         # Store colour-dict in variable
-        colour = stops.get("Color")
+        colour = route.get("Color")
 
         # Print out line and destination
-        lab = Label(routeRoot, text= f'{name} mot {dest}', bg=colour.get("fgColor"), fg=colour.get("bgColor"))
+        label = Label(routeRoot, text= f'{name} mot {destination}', bg=colour.get("fgColor"), fg=colour.get("bgColor"))
 
-        print(f'Number of stops: {len(stops.get("Stop"))}')
-        if len(stops.get("Stop")) > 60:
-            lab.grid(sticky=NE + SW, row=0, column=0, columnspan=6)
-            k = 6
-        elif len(stops.get("Stop")) > 30:
-            lab.grid(sticky=NE + SW, row=0, column=0, columnspan=4)
-            k = 4
+        print(f'Number of route: {len(route.get("Stop"))}')
+        if len(route.get("Stop")) > 60:
+            label.grid(sticky=NE + SW, row=0, column=0, columnspan=6)
+            columns = 6
+        elif len(route.get("Stop")) > 30:
+            label.grid(sticky=NE + SW, row=0, column=0, columnspan=4)
+            columns = 4
         else:
-            lab.grid(sticky=NE + SW, row=0, column=0, columnspan=2)
-            k = 2
+            label.grid(sticky=NE + SW, row=0, column=0, columnspan=2)
+            columns = 2
 
-        # Print stops and times
-        for i, j in enumerate(stops.get("Stop")):
+        # Print route and times
+        for i, stops in enumerate(route.get("Stop")):
             clm = 0
             row = i
-            if len(stops.get("Stop")) > 60:
-                if i >= 2 * len(stops.get("Stop")) // 3:
+            if len(route.get("Stop")) > 60:
+                if i >= 2 * len(route.get("Stop")) // 3:
                     clm = 4
-                    row = i - (2 * len(stops.get("Stop")) // 3)
-                elif i >= len(stops.get("Stop")) // 3:
+                    row = i - (2 * len(route.get("Stop")) // 3)
+                elif i >= len(route.get("Stop")) // 3:
                     clm = 2
-                    row = i - (len(stops.get("Stop")) // 3)
+                    row = i - (len(route.get("Stop")) // 3)
                 
-            elif len(stops.get("Stop")) > 30:
-                if i >= len(stops.get("Stop")) // 2:
+            elif len(route.get("Stop")) > 30:
+                if i >= len(route.get("Stop")) // 2:
                     clm = 2
-                    row = i - (len(stops.get("Stop")) // 2)
+                    row = i - (len(route.get("Stop")) // 2)
             
 
-            Label(routeRoot, text=j.get("name")).grid(sticky=NE + SW, row=row + 1, column=clm)
+            Label(routeRoot, text=stops.get("name")).grid(sticky=NE + SW, row=row + 1, column=clm)
             # Tries to get times. RT Dep -> TT Dep -> RT Arr -> TT Arr -> Error
-            if not j.get("rtDepTime"):
-                if not j.get("depTime"):
-                    if not j.get("rtArrTime"):
-                        if not j.get("arrTime"):
+            if not stops.get("rtDepTime"):
+                if not stops.get("depTime"):
+                    if not stops.get("rtArrTime"):
+                        if not stops.get("arrTime"):
                             Label(routeRoot, text="Error").grid(sticky=NE + SW, row=row + 1, column=clm + 1)
                         else:
-                            Label(routeRoot, text="a(" + j.get("arrTime") + ")").grid(sticky=NE + SW, row=row + 1, column=clm + 1)
+                            Label(routeRoot, text="a(" + stops.get("arrTime") + ")").grid(sticky=NE + SW, row=row + 1, column=clm + 1)
                     else:
-                        delay = misc.getDelay(j)
-                        Label(routeRoot, text="a" + j.get("arrTime") + delay).grid(sticky=NE + SW, row=row + 1, column=clm + 1)
+                        delay = misc.getDelay(stops)
+                        Label(routeRoot, text="a" + stops.get("arrTime") + delay).grid(sticky=NE + SW, row=row + 1, column=clm + 1)
                 else:
-                    Label(routeRoot, text="(" + j.get("depTime") + ")").grid(sticky=NE + SW, row=row + 1, column=clm + 1)
+                    Label(routeRoot, text="(" + stops.get("depTime") + ")").grid(sticky=NE + SW, row=row + 1, column=clm + 1)
             else:
-                delay = misc.getDelay(j)
-                Label(routeRoot, text=j.get("depTime") + delay).grid(sticky=NE + SW, row=row + 1, column=clm + 1)
+                delay = misc.getDelay(stops)
+                Label(routeRoot, text=stops.get("depTime") + delay).grid(sticky=NE + SW, row=row + 1, column=clm + 1)
 
-        Button(routeRoot, text="Karta", command= lambda: mapmaker.geometryBackEnd(stops.get("GeometryRef").get("ref"), colour.get("fgColor"))).grid(column=0, columnspan=k, sticky=NE+SW)
+        Button(routeRoot, text="Karta", command= lambda: mapmaker.geometryBackEnd(route.get("GeometryRef").get("ref"), colour.get("fgColor"))).grid(column=0, columnspan=columns, sticky=NE+SW)
 
-        Button(routeRoot, text="Stäng", command=routeRoot.destroy).grid(column=0, columnspan=k, sticky=NE + SW)
+        Button(routeRoot, text="Stäng", command=routeRoot.destroy).grid(column=0, columnspan=columns, sticky=NE + SW)
 
-    def depBox(self):
+    def departuresMenu(self):
         self.clearFrame()
         BackButton(self).grid(row=0, column=0, columnspan=3, sticky=NE + SW)
 
@@ -282,24 +282,24 @@ class Viewport(Tk):
         self.clearFrame()
         BackButton(self).grid(row=0, column=0, columnspan=3, sticky=NE + SW)
 
-        headline = Label(self.frame, text="Avgångar från " + stopname + " " + time_ + " " + date, pady=5, padx=10)
+        headline = Label(self.frame, text=f'Avgångar från {stopname} {time_} {date}', pady=5, padx=10)
         headline.grid(row=1, column=0, columnspan=3, sticky=E + W)
 
-        for i, j in enumerate(departures):
-            Label(self.frame, text=j.get("sname"), bg=j.get("fgColor"),
-                  fg=j.get("bgColor")).grid(row=i + 2, column=0, sticky=NE + SW)
-            Button(self.frame, text=j.get("direction"),
-                   command=lambda j=j: self.displayRoute(j.get("JourneyDetailRef").get("ref"))).grid(
+        for i, departure in enumerate(departures):
+            Label(self.frame, text=departure.get("sname"), bg=departure.get("fgColor"),
+                  fg=departure.get("bgColor")).grid(row=i + 2, column=0, sticky=NE + SW)
+            Button(self.frame, text=departure.get("direction"),
+                   command=lambda departure=departure: self.displayRoute(departure.get("JourneyDetailRef").get("ref"))).grid(
                 row=i + 2, column=1, sticky=E + W)
-            if not j.get("rtTime"):
-                Label(self.frame, text="ca " + j.get("time")).grid(row=i + 2, column=2, sticky=NE + SW)
+            if not departure.get("rtTime"):
+                Label(self.frame, text="ca " + departure.get("time")).grid(row=i + 2, column=2, sticky=NE + SW)
             else:
 
-                delay = misc.getDelay(j)
+                delay = misc.getDelay(departure)
 
-                Label(self.frame, text=j.get("time") + delay).grid(row=i + 2, column=2, sticky=NE + SW)
+                Label(self.frame, text=departure.get("time") + delay).grid(row=i + 2, column=2, sticky=NE + SW)
 
-    def takeHomeBox(self):
+    def takeMeHomeMenu(self):
         pass
 
     
