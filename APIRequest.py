@@ -128,7 +128,7 @@ class APIRequest():
             self.renewToken()
             r = requests.get(url, headers=self.headers)
 
-        with open("tempfiles/stops.txt", "w") as f:
+        with open("tempfiles/stops.json", "w") as f:
             json.dump(r.json(), f, indent=4)
             f.close()
 
