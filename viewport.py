@@ -72,9 +72,9 @@ class Viewport(Tk):
         self.sChTime = BooleanVar()
         self.x = BooleanVar()
 
-        Button(self.frame, text="Sök resa", command=lambda: self.plan(frombox.get(), tobox.get(), timebox.get(), datebox.get(), 
+        Button(self.frame, text="Sök resa", command=lambda: misc.plan(self, frombox.get(), tobox.get(), timebox.get(), datebox.get(), 
             self.arr.get(), self.sChTime.get())).grid(column=0, columnspan=4, sticky=NE + SW)
-        self.frame.bind("<Return>", lambda event: self.plan(frombox.get(), tobox.get(), timebox.get(), datebox.get(),
+        self.frame.bind("<Return>", lambda event: misc.plan(self, frombox.get(), tobox.get(), timebox.get(), datebox.get(),
                                                             self.arr.get(), self.sChTime.get()))
 
         self.frame.mainloop()
@@ -94,22 +94,6 @@ class Viewport(Tk):
 
         root.mainloop()
 
-    def plan(self, fr, to, timeP, date, arr, sChTime):
-        # print(arr)
-        # print(sChTime)
-
-        toStop, toStopname = self.api.findStop(to)
-        if not toStop:
-            print("Destination stop not found.")
-            return
-
-        frStop, frStopname = self.api.findStop(fr)
-        if not frStop:
-            print("Origin stop not found.")
-            return
-
-        trip = self.api.getPlan(frStop, toStop, time_=timeP, date=date, arr=arr, sChTime=sChTime)
-        self.printPlan(trip, toStopname, frStopname)
 
     def printPlan(self, trips, to, fr, frame=None):
         if frame is None:
