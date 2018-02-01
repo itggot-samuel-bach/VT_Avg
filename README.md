@@ -18,3 +18,6 @@ Handles all communication between the app and the Västtrafik API.
 
 #### mapmaker.py
 Has everything necessary for displaying routes in a google map.
+
+#### misc.py
+Includes miscellaneous functions.
