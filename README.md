@@ -14,4 +14,4 @@ Main file which coordinates everything. This is the file you run.
 Handles all communication between the app and the Västtrafik API.
 
 #### mapmaker.py
-Holds one class for displaying routes in a google map.
+Holds everything necessary for displaying routes in a google map.
