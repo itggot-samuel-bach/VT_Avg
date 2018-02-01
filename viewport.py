@@ -299,22 +299,12 @@ class Viewport(Tk):
 
         Button(self.frame, text="Nu", command=lambda: self.setNow(timebox, datebox)).grid(row=3, column=2, rowspan=2, sticky=NE + SW)
 
-        Button(self.frame, text="Sök", command=lambda: self.dep(stopbox.get(), timebox.get(), datebox.get())).grid(
+        Button(self.frame, text="Sök", command=lambda: misc.dep(self, stopbox.get(), timebox.get(), datebox.get())).grid(
             row=5, column=0, columnspan=3, sticky=NE + SW)
-        self.frame.bind("<Return>", lambda event: self.dep(stopbox.get(), timebox.get(), datebox.get()))
+        self.frame.bind("<Return>", lambda event: misc.dep(self, stopbox.get(), timebox.get(), datebox.get()))
 
         self.frame.mainloop()
 
-    def dep(self, stop, timeP, date):
-        # Find stop
-        stop, stopname = self.api.findStop(stop)
-        if not stop:
-            print("Stop not found.")
-            return
-
-        # Get departures from stop
-        departures = self.api.getDepartures(stop, date=date, time_=timeP)
-        self.printDepartures(departures, stopname, date, timeP)
 
     def printDepartures(self, departures, stopname, date, time_):
         self.clearFrame()

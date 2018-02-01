@@ -40,5 +40,16 @@ def plan(self, fr, to, timeP, date, arr, sChTime):
     trip = self.api.getPlan(frStop, toStop, time_=timeP, date=date, arr=arr, sChTime=sChTime)
     self.printPlan(trip, toStopname, frStopname)
 
+def dep(self, stop, timeP, date):
+    # Find stop
+    stop, stopname = self.api.findStop(stop)
+    if not stop:
+        print("Stop not found.")
+        return
+
+    # Get departures from stop
+    departures = self.api.getDepartures(stop, date=date, time_=timeP)
+    self.printDepartures(departures, stopname, date, timeP)
+
 if __name__ == "__main__":        
 	print("This file is only supposed to be used as a module.")
