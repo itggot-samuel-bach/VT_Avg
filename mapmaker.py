@@ -1,3 +1,7 @@
+import os
+import APIRequest
+import webbrowser
+
 class GeometryDoc():
     def __init__(self):
         self.polys = 0
@@ -101,6 +105,30 @@ class GeometryDoc():
             f.write(self.doc)
             f.close()
         print("saved")
+
+def geometryBackEnd(ref, colour=None):
+    doc = GeometryDoc()
+    if type(ref) == list:
+        for i in ref:
+            geoRef = i.get("GeometryRef").get("ref")
+            points = APIRequest.APIRequest().geometry(geoRef)
+            
+            colour = i.get("fgColor")
+            if colour is None: colour = "#00FF00"
+            
+            doc.addPoly(points, colour)
+            doc.addMarker(points[0])
+        doc.addMarker(points[-1])
+    
+    else:
+        points = APIRequest.APIRequest().geometry(ref)
+        doc.addPoly(points, colour)
+        doc.addMarker(points[0])
+        doc.addMarker(points[-1])
+
+    folder = os.path.dirname(__file__).replace("\\", "/")
+    path = "file:///" + folder + "/tempfiles/doc.html"
+    webbrowser.open(path)
 
 if __name__ == "__main__":        
 	print("This file is only supposed to be used as a module.")

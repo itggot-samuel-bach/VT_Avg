@@ -1,15 +1,12 @@
 # coding: utf-8
 
-import os
 import time
 import json
 from tkinter import *
-import webbrowser
+
 
 from APIRequest import APIRequest
-from mapmaker import GeometryDoc
-
-# os.chdir("C:\Edvin\Vasttrafik")
+import mapmaker
 		
 
 class BackButton(Frame):
@@ -144,7 +141,7 @@ class Window(Tk):
             Label(frame, text= f'Resa {trip1[0].get("Origin").get("time")}-{trip1[-1].get("Destination").get("time")} - Restid {str(tH)} h {str(tM)} min', pady=5).grid(row=0, column=0, columnspan=2, sticky=NE + SW)
                                                                                           
             print(trip1[0].get("GeometryRef").get("ref"))
-            Button(frame, text="Karta", command= lambda: self.geometryBackEnd(trip1)).grid(row=1, column=0, columnspan=2, sticky=NE+SW)
+            Button(frame, text="Karta", command= lambda: mapmaker.geometryBackEnd(trip1)).grid(row=1, column=0, columnspan=2, sticky=NE+SW)
 
             for i, j in enumerate(trip1):
                 if j.get("type") == "WALK":
@@ -170,7 +167,7 @@ class Window(Tk):
 
             Label(frame, text="Resa " + trip1.get("Origin").get("time") + "-" + trip1.get("Destination").get(
                 "time") + " - Restid " + str(tH) + " h " + str(tM) + " min", pady=5).pack(side=TOP, fill=X)
-            Button(frame, text="Karta", command= lambda: self.geometryBackEnd(trip1.get("GeometryRef").get("ref"), trip1.get("fgColor"))).pack(fill=X)
+            Button(frame, text="Karta", command= lambda: mapmaker.geometryBackEnd(trip1.get("GeometryRef").get("ref"), trip1.get("fgColor"))).pack(fill=X)
 
             Button(frame, text=trip1.get("name") + " till " + trip1.get("Destination").get("name"),
                    bg=trip1.get("fgColor"), fg=trip1.get("bgColor"),
@@ -304,7 +301,7 @@ class Window(Tk):
                     delay = " " + str(delay)
                 Label(routeRoot, text=j.get("depTime") + delay).grid(sticky=NE + SW, row=row + 1, column=clm + 1)
 
-        Button(routeRoot, text="Karta", command= lambda: self.geometryBackEnd(stops.get("GeometryRef").get("ref"), colour.get("fgColor"))).grid(column=0, columnspan=k, sticky=NE+SW)
+        Button(routeRoot, text="Karta", command= lambda: mapmaker.geometryBackEnd(stops.get("GeometryRef").get("ref"), colour.get("fgColor"))).grid(column=0, columnspan=k, sticky=NE+SW)
 
         Button(routeRoot, text="Stäng", command=routeRoot.destroy).grid(column=0, columnspan=k, sticky=NE + SW)
 
@@ -386,30 +383,7 @@ class Window(Tk):
     def takeHomeBox(self):
         pass
 
-    def geometryBackEnd(self, ref, colour=None):
-        if type(ref) == list:
-            doc = GeometryDoc()
-            for i in ref:
-                geoRef = i.get("GeometryRef").get("ref")
-                points = self.api.geometry(geoRef)
-                
-                colour = i.get("fgColor")
-                if colour is None: colour = "#00FF00"
-                
-                doc.addPoly(points, colour)
-                doc.addMarker(points[0])
-            doc.addMarker(points[-1])
-        
-        else:
-            points = self.api.geometry(ref)
-            doc = GeometryDoc()
-            doc.addPoly(points, colour)
-            doc.addMarker(points[0])
-            doc.addMarker(points[-1])
-
-        folder = os.path.dirname(__file__).replace("\\", "/")
-        path = "file:///" + folder + "/tempfiles/doc.html"
-        webbrowser.open(path)
+    
 
 if __name__ == "__main__":        
 	gui = Window()
