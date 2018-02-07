@@ -133,14 +133,11 @@ class Viewport(tk.Tk):
                     if not leg.get("Origin").get("name") == leg.get("Destination").get("name"):
                         tk.Label(frame, text=leg.get("Origin").get("time") + " - " + leg.get("Destination").get(
                             "time")).grid(row=i + 2, column=1, sticky=NESW)
-                        tk.Label(frame,
-                              text=leg.get("name") + " till " + leg.get("Destination").get("name")).grid(
-                            row=i + 2, column=0, sticky=NESW)
+                        tk.Label(frame,text=leg.get("name") + " till " + leg.get("Destination").get("name")).grid(row=i + 2, column=0, sticky=NESW)
 
 
                 else:
-                    tk.Label(frame, text=leg.get("Origin").get("time") + " - " + leg.get("Destination").get(
-                        "time")).grid(row=i + 2, column=1, sticky=NESW)
+                    tk.Label(frame, text=leg.get("Origin").get("time") + " - " + leg.get("Destination").get("time")).grid(row=i + 2, column=1, sticky=NESW)
                     tk.Button(frame, text=leg.get("name") + " till " + leg.get("Destination").get("name"),
                            bg=leg.get("fgColor"), fg=leg.get("bgColor"),
                            command=lambda leg=leg: self.displayRoute(leg.get("JourneyDetailRef").get("ref")),
@@ -150,16 +147,20 @@ class Viewport(tk.Tk):
         elif type(trip) == dict:
             triptime, tH, tM = misc.tripTime(trip)
 
-            tk.Label(frame, text="Resa " + trip.get("Origin").get("time") + "-" + trip.get("Destination").get(
-                "time") + " - Restid " + str(tH) + " h " + str(tM) + " min", pady=5).pack(side=tk.TOP, fill=X)
+            depTime = trip.get("Origin").get("time")
+            arrTime = trip.get("Destination").get("time")
+            depDelay = misc.getDelay(trip.get("Origin"))
+            arrDelay = misc.getDelay(trip.get("Destination"))
+            print(f'Dep delay: {depDelay}, Arr delay: {arrDelay}')
+
+            tk.Label(frame, text=f'Resa {depTime}-{arrTime} - Restid {str(tH)} h {str(tM)} min', pady=5).pack(side=tk.TOP, fill=tk.X)
             tk.Button(frame, text="Karta", command= lambda: mapmaker.geometryBackEnd(trip.get("GeometryRef").get("ref"), trip.get("fgColor"))).pack(fill=tk.X)
 
             tk.Button(frame, text=trip.get("name") + " till " + trip.get("Destination").get("name"),
                    bg=trip.get("fgColor"), fg=trip.get("bgColor"),
                    command=lambda: self.displayRoute(trip.get("JourneyDetailRef").get("ref")),
                    relief=tk.FLAT).pack(side=tk.LEFT, fill=tk.X)
-            tk.Label(frame, text=trip.get("Origin").get("time") + " - " + trip.get("Destination").get("time")).pack(
-                side=tk.LEFT)
+            tk.Label(frame, text=f'{depTime}{depDelay} - {arrTime}{arrDelay}').pack(side=tk.LEFT)
 
 
     def setNow(self, timebox, datebox):
