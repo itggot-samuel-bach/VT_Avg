@@ -155,9 +155,8 @@ class Viewport(tk.Tk):
             arrTime = trip.get("Destination").get("time")
             depDelay = misc.getDelay(trip.get("Origin"))
             arrDelay = misc.getDelay(trip.get("Destination"))
-            print(f'Dep delay: {depDelay}, Arr delay: {arrDelay}')
 
-            tk.Label(frame, text=f'Resa {depTime}-{arrTime} - Restid {str(tH)} h {str(tM)} min', pady=5).pack(side=tk.TOP, fill=tk.X)
+            tk.Label(frame, text=f'Resa {depTime}-{arrTime} - Restid {tH!s} h {tM!s} min', pady=5).pack(side=tk.TOP, fill=tk.X)
             tk.Button(frame, text="Karta", command= lambda: mapmaker.geometryBackEnd(trip.get("GeometryRef").get("ref"), trip.get("fgColor"))).pack(fill=tk.X)
 
             tk.Button(frame, text=trip.get("name") + " till " + trip.get("Destination").get("name"),
@@ -243,12 +242,12 @@ class Viewport(tk.Tk):
                             tk.Label(routeRoot, text="a(" + stops.get("arrTime") + ")").grid(sticky=NESW, row=row + 1, column=column + 1)
                     else:
                         delay = misc.getDelay(stops)
-                        tk.Label(routeRoot, text="a" + stops.get("arrTime") + delay).grid(sticky=NESW, row=row + 1, column=column + 1)
+                        tk.Label(routeRoot, text=f'a{stops.get("arrTime")} {delay}').grid(sticky=NESW, row=row + 1, column=column + 1)
                 else:
                     tk.Label(routeRoot, text="(" + stops.get("depTime") + ")").grid(sticky=NESW, row=row + 1, column=column + 1)
             else:
                 delay = misc.getDelay(stops)
-                tk.Label(routeRoot, text=stops.get("depTime") + delay).grid(sticky=NESW, row=row + 1, column=column + 1)
+                tk.Label(routeRoot, text=f'{stops.get("depTime")} {delay}').grid(sticky=NESW, row=row + 1, column=column + 1)
 
         tk.Button(routeRoot, text="Karta", command= lambda: mapmaker.geometryBackEnd(route.get("GeometryRef").get("ref"), colour.get("fgColor"))).grid(column=0, columnspan=columns, sticky=NESW)
 
@@ -297,13 +296,14 @@ class Viewport(tk.Tk):
             tk.Button(self.frame, text=departure.get("direction"),
                    command=lambda departure=departure: self.displayRoute(departure.get("JourneyDetailRef").get("ref"))).grid(
                 row=i + 2, column=1, sticky=tk.E + tk.W)
+
             if not departure.get("rtTime"):
                 tk.Label(self.frame, text="ca " + departure.get("time")).grid(row=i + 2, column=2, sticky=NESW)
             else:
 
                 delay = misc.getDelay(departure)
 
-                tk.Label(self.frame, text=departure.get("time") + delay).grid(row=i + 2, column=2, sticky=NESW)
+                tk.Label(self.frame, text=f'{departure.get("time")} {delay}').grid(row=i + 2, column=2, sticky=NESW)
 
     def takeMeHomeMenu(self):
         pass
