@@ -10,13 +10,14 @@ import misc
 		
 NESW = tk.NE + tk.SW
 
-class BackButton(tk.Frame):
+# Button for going back, added to every new page.
+class BackButton(tk.Frame): 
     def __init__(self, window):
         tk.Frame.__init__(self, window.frame)
         self.button = tk.Button(self, text="Gå tillbaka", command=window.mainMenu)
         self.button.pack(fill=tk.BOTH, expand=True)
 
-
+# Main window.
 class Viewport(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
@@ -27,11 +28,13 @@ class Viewport(tk.Tk):
         self.frame.pack()
         self.mainMenu()
 
-    def clearFrame(self):
+    # Clears the frame so new stuff can be put in.
+    def clearFrame(self): 
         for widget in self.frame.winfo_children():
             widget.destroy()
 
-    def mainMenu(self):
+    # Create the main menu.
+    def mainMenu(self): 
         self.clearFrame()
 
         tk.Label(self.frame, text="Välkommen till planeraren!", font='bold', padx=10, pady=5).pack(fill=tk.BOTH, expand=True)
@@ -40,7 +43,8 @@ class Viewport(tk.Tk):
         tk.Button(self.frame, text="Ta mig hem", padx=5, pady=2, command=self.takeMeHomeMenu).pack(fill=tk.BOTH, expand=True)
         self.frame.mainloop()
 
-    def tripPlanMenu(self):
+    # Create menu for searching trips.
+    def tripPlanMenu(self): 
         self.clearFrame()
         BackButton(self).grid(row=0, column=0, columnspan=4, sticky=NESW)
 
@@ -80,7 +84,8 @@ class Viewport(tk.Tk):
 
         self.frame.mainloop()
 
-    def moreOptions(self):
+    # Create box for more options when planning trip.
+    def moreOptions(self): 
         root = tk.Toplevel()
         tk.Label(root, text="Fler val", font="bold").grid(row=0, column=0, columnspan=2, sticky=NESW)
 
@@ -95,7 +100,7 @@ class Viewport(tk.Tk):
 
         root.mainloop()
 
-
+    # Print the trip plan.
     def printPlan(self, trips, to, fr, frame=None):
         if frame is None:
             frame = self.frame
@@ -103,10 +108,12 @@ class Viewport(tk.Tk):
             BackButton(self).grid(column=0, columnspan=2, sticky=NESW)
         trip = []
 
+        # If more than one alternative
         if type(trips) == list:
             for i in trips:
                 trip.append(i.get("Leg"))
-        elif type(trips) == dict:
+        # If only one alternative
+        elif type(trips) == dict: 
             trip[0] = trips.get("Leg")
 
         tk.Label(frame, font='bold', text=f'Fr\u00e5n {fr} till {to}').grid(column=0, columnspan=2, sticky=NESW)
@@ -115,19 +122,21 @@ class Viewport(tk.Tk):
         for i in trip:
             self.printLeg(frame, i)
 
-    def printLeg(self, root, trip):
+    # Prints each trip alternative.
+    def printLeg(self, root, trip): 
         frame = tk.Frame(root, bd=2, relief=tk.GROOVE)
         frame.grid(column=0, columnspan=2, sticky=NESW)
 
-        if type(trip) == list:
+        # If more than one leg (1+ changes)
+        if type(trip) == list: 
 
             triptime, tH, tM = misc.tripTime(trip)
 
             tk.Label(frame, text= f'Resa {trip[0].get("Origin").get("time")}-{trip[-1].get("Destination").get("time")} - Restid {str(tH)} h {str(tM)} min', pady=5).grid(row=0, column=0, columnspan=2, sticky=NESW)
                                                                                           
-            # print(trip[0].get("GeometryRef").get("ref"))
             tk.Button(frame, text="Karta", command= lambda: mapmaker.geometryBackEnd(trip)).grid(row=1, column=0, columnspan=2, sticky=NESW)
 
+            # Go through all legs and print them
             for i, leg in enumerate(trip):
                 depTime = leg.get("Origin").get("time")
                 arrTime = leg.get("Destination").get("time")
@@ -135,20 +144,22 @@ class Viewport(tk.Tk):
                 arrDelay = misc.getDelay(leg.get("Destination"))
 
                 if leg.get("type") == "WALK":
-                    if not leg.get("Origin").get("name") == leg.get("Destination").get("name"):
+                    #Exclude walks inside the same stop.
+                    if not leg.get("Origin").get("name") == leg.get("Destination").get("name"): 
                         tk.Label(frame,text=leg.get("name") + " till " + leg.get("Destination").get("name")).grid(row=i + 2, column=0, sticky=NESW)
                         tk.Label(frame, text=f'{depTime} - {arrTime}').grid(row=i + 2, column=1, sticky=NESW)
 
 
                 else:
+                    # Print line, destination and times
                     tk.Button(frame, text=leg.get("name") + " till " + leg.get("Destination").get("name"),
                            bg=leg.get("fgColor"), fg=leg.get("bgColor"),
                            command=lambda leg=leg: self.displayRoute(leg.get("JourneyDetailRef").get("ref")),
                            relief=tk.FLAT).grid(row=i + 2, column=0, sticky=NESW)
                     tk.Label(frame, text=f'{depTime}{depDelay} - {arrTime}{arrDelay}').grid(row=i + 2, column=1, sticky=NESW)
 
-
-        elif type(trip) == dict:
+        # If only one leg. (No changes)
+        elif type(trip) == dict: 
             triptime, tH, tM = misc.tripTime(trip)
 
             depTime = trip.get("Origin").get("time")
@@ -166,16 +177,15 @@ class Viewport(tk.Tk):
             tk.Label(frame, text=f'{depTime}{depDelay} - {arrTime}{arrDelay}').pack(side=tk.LEFT)
 
 
-    def setNow(self, timebox, datebox):
+    def setNow(self, timebox, datebox): #Add current time and date to entry fields
         timebox.delete(0, tk.END)
         timebox.insert(tk.END, time.strftime("%H:%M"))
         datebox.delete(0, tk.END)
         datebox.insert(tk.END, time.strftime("%Y-%m-%d"))
 
-    def displayRoute(self, url):
+    def displayRoute(self, url): # Display line, stops and times for one departure.
         route = self.api.getRoute(url)
 
-        # New Tkinter window
         routeRoot = tk.Toplevel()
 
         # Get name of route ("Buss 50")
@@ -202,7 +212,7 @@ class Viewport(tk.Tk):
         # Print out line and destination
         label = tk.Label(routeRoot, text= f'{name} mot {destination}', bg=colour.get("fgColor"), fg=colour.get("bgColor"))
 
-        print(f'Number of route: {len(route.get("Stop"))}')
+        # Determines how many columns are necessary
         if len(route.get("Stop")) > 60:
             label.grid(sticky=NESW, row=0, column=0, columnspan=6)
             columns = 6
@@ -217,6 +227,7 @@ class Viewport(tk.Tk):
         for i, stops in enumerate(route.get("Stop")):
             column = 0
             row = i
+            # Changes what column stuff is being put into.
             if len(route.get("Stop")) > 60:
                 if i >= 2 * len(route.get("Stop")) // 3:
                     column = 4
@@ -230,8 +241,9 @@ class Viewport(tk.Tk):
                     column = 2
                     row = i - (len(route.get("Stop")) // 2)
             
-
+            # Prints name of stop 
             tk.Label(routeRoot, text=stops.get("name")).grid(sticky=NESW, row=row + 1, column=column)
+
             # Tries to get times. RT Dep -> TT Dep -> RT Arr -> TT Arr -> Error
             if not stops.get("rtDepTime"):
                 if not stops.get("depTime"):
@@ -253,6 +265,7 @@ class Viewport(tk.Tk):
 
         tk.Button(routeRoot, text="Stäng", command=routeRoot.destroy).grid(column=0, columnspan=columns, sticky=NESW)
 
+    # Create menu for choosing stop and times for viewing departures.
     def departuresMenu(self):
         self.clearFrame()
         BackButton(self).grid(row=0, column=0, columnspan=3, sticky=NESW)
@@ -282,14 +295,16 @@ class Viewport(tk.Tk):
 
         self.frame.mainloop()
 
-
+    # Print the departures for the stop. Line, destination, time and delay.
     def printDepartures(self, departures, stopname, date, time_):
         self.clearFrame()
         BackButton(self).grid(row=0, column=0, columnspan=3, sticky=NESW)
 
+        # Print stopname and time.
         headline = tk.Label(self.frame, text=f'Avgångar från {stopname} {time_} {date}', pady=5, padx=10)
         headline.grid(row=1, column=0, columnspan=3, sticky=tk.E + tk.W)
 
+        # Go through all departures and add buttons to printJourney.
         for i, departure in enumerate(departures):
             tk.Label(self.frame, text=departure.get("sname"), bg=departure.get("fgColor"),
                   fg=departure.get("bgColor")).grid(row=i + 2, column=0, sticky=NESW)
@@ -305,6 +320,7 @@ class Viewport(tk.Tk):
 
                 tk.Label(self.frame, text=f'{departure.get("time")} {delay}').grid(row=i + 2, column=2, sticky=NESW)
 
+    # Not implemented
     def takeMeHomeMenu(self):
         pass
 
