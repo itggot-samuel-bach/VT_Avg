@@ -74,7 +74,8 @@ def getDelay(times):
         hr2, min2 = times.get("time").split(":")
         rtDate = times.get("rtDate")
         date = times.get("date")
-
+    elif times.get("cancelled") == "true":
+        return " Inställd"
     else:
         return " Error"
         
@@ -90,9 +91,9 @@ def getDelay(times):
     min2 += hr2 * 60
     delay = min1 - min2
     if delay >= 0:
-        delay = " +" + str(delay)
+        delay = "+" + str(delay)
     else:
-        delay = " " + str(delay)
+        delay = str(delay)
         
     return delay
 
