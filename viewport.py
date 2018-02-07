@@ -129,19 +129,23 @@ class Viewport(tk.Tk):
             tk.Button(frame, text="Karta", command= lambda: mapmaker.geometryBackEnd(trip)).grid(row=1, column=0, columnspan=2, sticky=NESW)
 
             for i, leg in enumerate(trip):
+                depTime = leg.get("Origin").get("time")
+                arrTime = leg.get("Destination").get("time")
+                depDelay = misc.getDelay(leg.get("Origin"))
+                arrDelay = misc.getDelay(leg.get("Destination"))
+
                 if leg.get("type") == "WALK":
                     if not leg.get("Origin").get("name") == leg.get("Destination").get("name"):
-                        tk.Label(frame, text=leg.get("Origin").get("time") + " - " + leg.get("Destination").get(
-                            "time")).grid(row=i + 2, column=1, sticky=NESW)
                         tk.Label(frame,text=leg.get("name") + " till " + leg.get("Destination").get("name")).grid(row=i + 2, column=0, sticky=NESW)
+                        tk.Label(frame, text=f'{depTime} - {arrTime}').grid(row=i + 2, column=1, sticky=NESW)
 
 
                 else:
-                    tk.Label(frame, text=leg.get("Origin").get("time") + " - " + leg.get("Destination").get("time")).grid(row=i + 2, column=1, sticky=NESW)
                     tk.Button(frame, text=leg.get("name") + " till " + leg.get("Destination").get("name"),
                            bg=leg.get("fgColor"), fg=leg.get("bgColor"),
                            command=lambda leg=leg: self.displayRoute(leg.get("JourneyDetailRef").get("ref")),
                            relief=tk.FLAT).grid(row=i + 2, column=0, sticky=NESW)
+                    tk.Label(frame, text=f'{depTime}{depDelay} - {arrTime}{arrDelay}').grid(row=i + 2, column=1, sticky=NESW)
 
 
         elif type(trip) == dict:
