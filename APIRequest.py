@@ -5,6 +5,7 @@ import time
 
 import requests
 
+# Class handling all communication with the API
 class APIRequest():
     def __init__(self):
         # Read saved token
@@ -12,12 +13,13 @@ class APIRequest():
             with open("tempfiles/token.txt") as f:
                 token = f.read()
                 f.close()
+            # Save token for future use
             placeholder = "Bearer " + token
             self.headers = {"Authorization": placeholder}
         except FileNotFoundError:
             self.renewToken()
 
-
+    # Getting a trip plan
     def getPlan(self, fr, to, time_=time.strftime("%H:%M"), date=time.strftime("%Y-%m-%d"), arr=False, smallChangeTime=False):
         try:
             hour, minute = time_.split(":")
@@ -28,18 +30,18 @@ class APIRequest():
                 print("Could not interpret.")
                 return
 
-        url = "https://api.vasttrafik.se/bin/rest.exe/v2/trip?originId=" + fr + "&destId=" + to + "&date=" + date + "&time=" + hour + "%3A" + minute + "&format=json&needGeo=1"
+        # URL for the API
+        url = f'https://api.vasttrafik.se/bin/rest.exe/v2/trip?originId={fr}&destId={to}&date={date}&time={hour}%3A{minute}&format=json&needGeo=1'
         if arr:
             url += "&searchForArrival=1"
         if smallChangeTime:
             url += "&disregardDefaultChangeMargin=1"
-        # print(url)
 
         # Http request trip
         r = requests.get(url, headers=self.headers)
         print("Status code:", r.status_code)
 
-        # if token is invalid
+        # If token is invalid
         if r.status_code == 401:
             self.renewToken()
 
@@ -56,7 +58,9 @@ class APIRequest():
         trips = r.json().get("TripList").get("Trip")
         return trips
 
+    # Renew token if invalid or nonexistent
     def renewToken(self):
+        # Get the codes necessary for renewal
         with open("auth.txt", "r") as file:
             auth = file.read()
             file.close()
@@ -68,13 +72,14 @@ class APIRequest():
 
         token = text.get("access_token")
 
-        # save token for use next time
+        # Save token for use next time
         with open("tempfiles/token.txt", "w") as file:
             file.write(token)
             file.close()
         placeholder = "Bearer " + token
         self.headers = {"Authorization": placeholder}
 
+    # Get departures from stop
     def getDepartures(self, stop, date=time.strftime("%Y-%m-%d"), time_=time.strftime("%H:%M"), arr=False, direction=None):
         try:
             hour, minute = time_.split(":")
@@ -85,6 +90,7 @@ class APIRequest():
                 print("Could not interpret.")
                 return
 
+        # Base url
         url = "https://api.vasttrafik.se/bin/rest.exe/v2/departureBoard?id=" + stop + "&date=" + date + "&time=" + hour + "%3A" + minute + "&format=json"
         if arr:
             url.replace("departureBoard", "arrivalBoard")
@@ -118,6 +124,7 @@ class APIRequest():
             arrivals = r.json().get("ArrivalBoard").get("Arrival")
             return arrivals
 
+    # Find stop from input
     def findStop(self, inp):
         # HTTP Request
         url = f'https://api.vasttrafik.se/bin/rest.exe/v2/location.name?input={inp}&format=json'
@@ -129,6 +136,7 @@ class APIRequest():
             self.renewToken()
             r = requests.get(url, headers=self.headers)
 
+        # Save json file for easier viewing
         with open("tempfiles/stops.json", "w") as file:
             json.dump(r.json(), file, indent=4)
             file.close()
@@ -154,6 +162,7 @@ class APIRequest():
 
         return stop, stopname
 
+    # Get a line's departure (route, journey, whatever)
     def getRoute(self, url):
         # HTTP Request
         
@@ -174,8 +183,9 @@ class APIRequest():
         stops = r.json().get("JourneyDetail")
         return stops
 
+    # Get polylines for maps
     def geometry(self, ref):
-        
+        # HTTP request
         r = requests.get(ref, headers=self.headers)
 
         if r.status_code == 401:
@@ -188,9 +198,11 @@ class APIRequest():
         if r.status_code != 200:
             raise ValueError("Http error: " + str(r.status_code))
 
+        # Save json for easier viewing
         with open("tempfiles/geo.json", "w") as file:
             json.dump(r.json(), file, indent=4)
 
+        # Return dict of results
         geo = r.json().get("Geometry").get("Points").get("Point")
         return geo
 
