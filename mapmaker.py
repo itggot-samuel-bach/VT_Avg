@@ -6,6 +6,7 @@ import webbrowser
 
 import APIRequest
 
+# Class for creating HTML document with google map with polylines
 class GeometryDoc():
     def __init__(self):
         self.polys = 0
@@ -56,7 +57,8 @@ class GeometryDoc():
                       </body>
                     </html>"""
                     
-                    
+
+    # Add the polylines to the map   
     def addPoly(self, points, colour):
         #print(points)
         document = "var route" + str(self.polys) + """ = [];
@@ -71,7 +73,8 @@ class GeometryDoc():
                             flightPath""" + str(self.polys) + """.setMap(map);
                             
                             //NEW"""
-                            
+
+        # Replace characters so google maps understands it                  
         document = document.replace(" = []", " = " + str(points).replace("},", "},\n").replace("'", "").replace('"', ""))
         document = document.replace("lon:", "lng:")
         
@@ -83,6 +86,7 @@ class GeometryDoc():
         #print(self.document)
         self.save()
         
+    # Add a marker to the map
     def addMarker(self, points):
         if type(points) != dict:
             raise TypeError(f'Expected dict, {str(type(points))} received.')
@@ -104,14 +108,18 @@ class GeometryDoc():
         self.markers += 1
         self.save()
         
+    # Save the HTML document
     def save(self):
         with open("tempfiles/document.html", "w") as file:
             file.write(self.document)
             file.close()
         # print("saved")
 
+# Function called when you want to create a map
 def geometryBackEnd(ref, colour=None):
     document = GeometryDoc()
+
+    # If there are multiple legs
     if type(ref) == list:
         for item in ref:
             geoRef = item.get("GeometryRef").get("ref")
@@ -124,12 +132,14 @@ def geometryBackEnd(ref, colour=None):
             document.addMarker(points[0])
         document.addMarker(points[-1])
     
+    # If there is only one leg
     else:
         points = APIRequest.APIRequest().geometry(ref)
         document.addPoly(points, colour)
         document.addMarker(points[0])
         document.addMarker(points[-1])
 
+    # Open the file in a web browser
     folder = os.path.dirname(__file__).replace("\\", "/")
     path = f'file:///{folder}/tempfiles/document.html'
     webbrowser.open(path)
